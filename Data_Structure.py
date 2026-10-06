@@ -182,6 +182,33 @@ s = {"alice", "banana"}
 import heapq
 
 heap = [8, 3, 10, 1, 6, 14, 4]
+heapq.heapify(heap)
+
+def sift_down(arr, n, i):
+    while True:
+        parent = i
+
+        left = 2 * i + 1
+        right = 2 * i + 2
+
+        if left < n and arr[left] < arr[parent]:
+            parent = left
+
+        if right < n and arr[right] < arr[parent]:
+            parent = right
+
+        if parent == i:
+            break
+
+        arr[i], arr[parent] = arr[parent], arr[i]
+
+        i = parent
+
+def heapify(arr):
+    n = len(arr)
+
+    for i in range(n // 2 - 1, -1, -1):
+        sift_down(arr, n, i)
 
 # 정렬된 Tree와의 차이점
 # Heap은 parent <= child 라는 조건만 만족하면 되기 때문에

@@ -118,4 +118,228 @@ def build_prefix(nums):
 
 #######################################################################################
 
+# Sort(정렬)
+
+# 이번 챕터에서 알아가야 할 것
+# - O(n²) 정렬과 O(n log n) 정렬의 차이
+# - Stable / Unstable
+# - In-place 여부
+# - Merge Sort와 Quick Sort의 trade-off
+# - Heap Sort가 왜 O(n log n)인지
+# - Python의 sort() / sorted() 특징
+# - 이미 거의 정렬된 데이터에서는 어떤 방법이 유리한지
+# - 정렬을 활용하면 원래 O(n²) 문제를 O(n log n)으로 바꿀 수 있는 경우
+
+# 비교 정렬의 한계
+# 5 < 2 ?, 8 < 5 ?, 3 < 8 ? 처럼 비교만으로 n개의 데이터를 정렬하는 알고리즘은
+# 일반적으로 O(n log n)보다 빠른 최악 시간복잡도를 가질 수 없다.
+
+#######################################################################################
+
+# Bubble Sort
+# 인접한 두 값을 비교해서 큰 값을 오른쪽으로 밀어낸다
+# Stable Sort
+# 시간복잡도: 최고 O(n), 평균 O(n²), 최악 O(n²)
+# 공간 시간복잡도: O(1)
+
+nums = [5, 2, 8, 1, 3]
+
+def bubble_sort(nums):
+    for i in (n - 1, 0, -1):
+        swapped = False;
+
+        for j in range(i):
+            if nums[i] > nums[i + 1]:
+                nums[i], nums[i + 1] = nums[i + 1], nums[i]
+                swapped = True
+
+        if not swapped:
+            break
+
+    return nums
+
+#######################################################################################
+
+# Selection Sort
+# 매번 가장 작은 값을 찾아 앞으로 보낸다.
+# Unstable Sort
+# 시간복잡도: O(n²)
+
+nums = [5, 2, 8, 1, 3]
+
+def selection_sort(nums):
+    n = len(nums)
+
+    for i in range(n):
+        min_idx = i 
+
+        for j in range(i + 1, n):
+            if nums[j] < nums[min_idx]:
+                min_idx = j
+
+        nums[i], nums[min_idx] = nums[min_idx], nums[i]
+
+    return nums
+
+# Stable Sort와 Unstable Sort의 차이점은 뭘까
+# 동일한 key를 가진 데이터들의 기존 상대적 순서를 유지하는지 변경되는지에 따라
+# Stable과 Unstable로 나뉜다.
+# 다중 조건 정렬에서 중요하게 쓰인다.
+
+#######################################################################################
+
+# Insertion Sort
+# 정렬된 영역에 새로운 값을 적절한 위치에 삽입한다.
+# Stable Sort
+# 시간복잡도: 최고 O(n), 평균 O(n²), 최악 O(n²)
+
+def insertion_sort(nums):
+    temp = nums[:]
+
+    for i in range(1, len(nums)):
+        current = nums[i]
+        j = i - 1
+
+        while j >= 0 and nums[j] > current:
+            nums[j + 1] = nums[j]
+            j -= 1
+
+        nums[j + 1] = current
+
+    return nums
+
+# 거의 정렬된 배열에서 왜 O(n)에 가까운 성능을 낼 수 있는 것일까?
+# 데이터가 거의 정렬되어 있으면
+# 이동해야 할 거리가 짧아 전체 작업량이 선형 수준에 가까워질 수 있다.
+
+#######################################################################################
+
+# Merge Sort
+# 여기서부턴 많이 쓰이는 O(n log n) 알고리즘이다.
+# 큰 문제를 작은 문제로 나누고, 각각 해결한 뒤 합친다.
+# Stable Sort
+# 시간복잡도: O(n log n)
+
+nums = [5, 2, 8, 1, 3]
+
+def merge_sort(nums):
+    if len(nums) <= 1:
+        return nums
+
+    mid = len(nums) // 2
+    left = merge_sort(nums[:mid])
+    right = merge_sort(nums[mid:])
+
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = 0
+    j = 0
+
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+
+    result.extend(left[i:])
+    result.extend(right[j:])
+
+    return result
+
+# 깊이가 O(log n), 병합 작업량이 O(n) 이기 때문에
+# 최종 시간복잡도는 O(n) * O(log n) = O(n log n) 이다.
+
+#######################################################################################
+
+# Quick Sort
+# pivot을 하나 선택하여 비교한 후,
+# 작으면 좌측, 크면 우측으로 계속 정렬한다.
+# Unstable Sort
+# 시간복잡도: 평균 O(n log n), 최악 O(n²)
+
+nums = [5, 2, 8, 1, 3]
+
+def quick_sort(nums):
+    if len(nums) <= 1:
+        return nums
+
+    pivot = nums[len(nums) // 2]
+
+    left = []
+    equal = []
+    right = []
+
+    for x in nums:
+        if x < pivot:
+            left.append(x)
+        elif x > pivot:
+            right.append(x)
+        else:
+            equal.append(x)
+
+    return quick_sort(left) + equal + quick_sort(right)
+
+# 만약 pivot이 계속 최악으로 선택되어
+# left 혹은 right로 객체들이 치우쳐질 경우에는 재귀가 깊어지므로
+# O(n²)의 시간복잡도가 소요될 수 있다.
+# 그래서 Median-of-Three나 Randomized Pivot 형태로 사용하여
+# 항상 안전하게 평균 성능인 O(n log n)을 보장받을 수 있도록 한다.
+
+# 최악의 시간복잡도를 고려하였을 때,
+# 항상 O(n log n)을 보장하지 못하는 Quick Sort가 왜 중요할까?
+# In-place Partition(제자리 분할), Cache Locality(캐시 지역성) 때문이다.
+# 임시 배열을 만들고 메모리를 계속 이동해야 하는 Merge Sort와 달리
+# Quick Sort는 현재 배열 내에서 이웃한 데이터까지 정렬하기 때문에
+# 실제 실행 속도가 훨씬 빠르다.
+
+#######################################################################################
+
+# Heap Sort
+# Heap을 만들어 최솟값과 최댓값을 반복해서 꺼내어 정렬한다.
+# Unstable Sort
+# heapify의 시간복잡도: O(n)
+# heappop n번의 시간복잡도: n * O(log n)
+# 전체 시간복잡도: O(n log n)
+
+import heapq
+
+nums = [5, 2, 8, 1, 3]      # heapify시, [1, 2, 8, 5, 3]
+
+def heap_sort(nums):
+    heap = nums[:]
+    heapq.heapify(heap)     # list를 heap, 즉 완전 이진 트리 형태로 만들어준다.
+
+    result = []
+
+    while heap:
+        result.append(heapq.heappop(heap))
+
+    return result
+
+# 파이썬에서는 보통 sort()나 sorted() 함수를 통해
+# 직접 구현 없이 배열을 정렬한다.
+# sort()와 sorted()의 차이점은
+# sort()는 기존 list를 변경하지만, sorted()는 새로운 list을 반환한다.
+
+#######################################################################################
+
+# Timsort
+# 파이썬의 sort()는 Timsort 계열의 정렬을 사용한다.
+# Merge Sort + Insertion Sort 등의 아이디어를 활용하고,
+# 실제 데이터에 이미 존재하는 정렬된 구간을 적극 활용하는
+# Adaptive Stable Sort(적응형 안정 정렬)이다.
+
+# 시간복잡도: 최악 O(n log n), 최고 O(n)
+
+# 그렇다면, 왜 파이썬의 Timsort에서는 C++과 달리 Quick Sort를 쓰지 않을까?
+# 그 이유는 파이썬 배열의 요소들은 객체 그 자체가 아니라 주소값이기 때문이다.
+# 그래서주소값들을 계속 무작위로 swap하며 비교하므로
+# CPU의 캐시 메모리를 전혀 활용하지 못해 성능이 떨어진다.
+
+#######################################################################################
+
 #
