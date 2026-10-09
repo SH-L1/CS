@@ -346,3 +346,150 @@ def heap_sort(nums):
 # 정답이 있을 수 없는 절반을 매번 버린다.
 # 시간복잡도: O(log n)
 # 공간복잡도: O(1)
+
+nums = [1, 3, 5, 7, 9, 11]
+target = 9
+
+def binary_search(nums, target):
+    left = 0
+    right = len(nums) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if nums[mid] == target:
+            return mid
+
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1
+
+# 실전에서 중요한 것은
+# 첫 번째로 target 이상인 위치
+# 마지막으로 target 이하인 위치
+# target이 처음 등장하는 위치
+# target이 마지막으로 등장하는 위치
+# 조건을 처음 만족하는 값
+# 이게 바로 Boundary Binary Search다.
+
+#######################################################################################
+
+# Lower Bound
+# target 이상인 값 중 가장 왼쪽에 있는 값의 인덱스를 반환한다.
+
+nums = [1, 2, 2, 2, 5, 8]
+target = 2
+
+def lower_bound(nums, target):
+    left = 0
+    right = len(nums)
+
+    while left < right:
+        mid = (left + right) // 2
+
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid
+
+    return left
+
+# Lower Bound에서 왜 right = mid인가?
+# nums[mid] >= target인 경우, mid가 답일 수도 있다.
+# 우리가 원하는 건 첫 번째 위치이기 때문에
+# mid를 버리지 않고 right를 mid로 옮겨서 범위를 좁힌다.
+# 즉, mid가 첫 번째 위치일 경우, right = mid - 1 하게 된다면
+# mid를 버리게 되어 답을 놓치게 된다.
+
+#######################################################################################
+
+# Upper Bound
+# target 초과인 값 중 가장 왼쪽에 있는 값의 인덱스를 반환한다.
+
+nums = [1, 2, 2, 2, 5, 8]
+target = 2
+
+def upper_bound(nums, target):
+    left = 0
+    right = len(nums)
+
+    while left < right:
+        mid = (left + right) // 2
+
+        if nums[mid] <= target:
+            left = mid + 1
+        else:
+            right = mid
+
+    return left
+
+# Lower Bound와 Upper Bound의 차이는
+# if nums[mid] < target: / if nums[mid] <= target: 의 차이이다.
+
+# 중복 개수의 경우
+# count = upper_bound(nums, target) - lower_bound(nums, target)
+# 로 빠르게 구할 수 있다.
+
+from bisect import bisect_left, bisect_right
+
+nums = [1, 2, 2, 2, 5, 8]
+
+print(bisect_left(nums, 2))     # lower bound
+print(bisect_right(nums, 2))    # upper bound
+
+# 그러나 nums.insert(index, x) 자체는
+# list 중간 삽입이라 O(n)이다.
+# bisect으로 index를 찾는 건 O(log n)이지만
+# 실제 삽입까지 포함하면 O(n)이다.
+
+#########################################################################################
+
+# Binary Search on Answer
+# Binary Search를 배열 검색 뿐만이 아니라
+# 정답의 범위 자체를 이분 탐색하여 최적의 값을 찾을 수 있다.
+
+# 예를 들어 [7, 2, 5, 10, 8] 이라는 배열이 있고
+# 각 그룹의 합을 x 이하로 유지하면서 2개 이하의 그룹으로 나눌 수 있는지
+# 이를 검사할 수 있다.
+# 즉, x가 가능한지 여부를 판단하는 함수가 존재한다.
+# 쉽게 말해 False False ... True True라는
+# monotonicity(단조성)이 생긴다.
+
+# 제곱근 예제: x² >= n 을 만족하는 가장 작은 정수 x를 찾는 문제
+n = 30
+
+def ceil_sqrt(n):
+    left = 0
+    right = n
+
+    while left < right:
+        mid = (left + right) // 2
+
+        if mid * mid >= n:
+            right = mid
+        else:
+            left = mid + 1
+    
+    return left
+
+# 핵심 사고
+# 1. 정답의 범위는? left ~ right
+# 2. 어떤 후보 x가 가능한 지 검사할 수 있는가?
+# 3. feasible 결과가 단조적인가? True True ... False False
+# 4. 첫 True / 마지막 True를 Binary Search로 찾는다.
+
+# 대표 문제 패턴
+# 최소 가능한 최대값
+# 최대 가능한 최소값
+# 최소 시간
+# 최소 용량
+# 최대 거리
+# 몇 개 이하로 만들 수 있는가
+# 주어진 시간 안에 가능한가
+
+#########################################################################################
+
+#
