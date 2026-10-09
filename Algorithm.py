@@ -492,4 +492,112 @@ def ceil_sqrt(n):
 
 #########################################################################################
 
-#
+# Recursion
+# 재귀는 함수가 자기 자신을 호출하는 방식이다.
+# 시간복잡도: O(n)
+# 추가 공간: O(n)
+
+def countdown(n):
+    if n == 0:
+        return
+
+    print(n)
+    countdown(n - 1)
+
+# 호출 스택을 살펴보자.
+# countdown(0) -> countdown(1) -> countdown(2) -> ... -> countdown(n)
+# 즉, 재귀는 Stack 방식으로 제거된다.
+
+# 재귀에는 반드시 종료조건인 Base Case가 중요하다.
+# 그렇지 않을 경우, 끝없이 자기 자신을 호출하기 때문이다.
+# 그래서 재귀는 항상 Base Case(종료조건)과 Recursive Case(더 작은 문제) 두 부분으로 생각한다.
+
+# 재귀는 시간복잡도는 O(n)이지만,
+# Call Stack에 쌓이는 n개의 frame으로 인하여
+# 추가 공간 O(n)이 필요하다.
+
+# 그래서 재귀가 항상 더 좋은 것은 아닌데 왜 사용할까?
+# Tree, DFS, Divide & Conquer, Backtracking, Dynamic Programming 와 같이
+# 큰 문제 -> 작은 문제 -> 더 작은 문제 형태의
+# 재귀적인 구조를 가지는 경우가 많기 때문이다.
+
+def dfs(node):
+    if node is None:
+        return
+
+    dfs(node.left)
+    dfs(node.right)
+
+#########################################################################################
+
+# Backtracking
+# 선택 -> 탐색 -> 선택 취소 형태를 가진다.
+# Choose -> Explore -> Unchoose 구조
+
+def permutations(nums):
+    result = []
+    path = []
+    used = [False] * len(nums)
+
+    def backtracking():
+        if len(path) == len(nums):
+            result.append(path.copy())
+            return
+
+        for i in range(len(nums)):
+            if used[i]:
+                continue
+
+            used[i] = True
+            path.append(nums[i])
+
+            backtracking()
+
+            path.pop()
+            used[i] = False
+
+    backtracking()
+    return result
+
+# Backtracking은 상태 공간 Tree(State Space Tree)를 DFS하는 것이다.
+# 즉, 가능한 선택들의 Tree를 DFS하면서
+# 불필요한 선택을 되돌리는 것이라고 이해하면 된다.
+
+#########################################################################################
+
+# 순열 하나의 시간복잡도는 O(n * n!) 정도로 볼 수 있다.
+# 그래서 경우의 수 전체를 실제로 생성하는 Backtracking의 경우에는
+# 매우 비싼 비용을 치러야 한다고 볼 수 있다.
+
+# Combination과 순열의 차이점
+# 순열은 순서도 신경쓰지만, Combination은 순서를 무시한다.
+
+# Combination Backtracking
+
+def combinations(nums, k):
+    result = []
+    path = []
+
+    def backtracking(start):
+        if len(path) == k:
+            result.append(path.copy())
+            return
+
+        for i in range(start, len(nums)):
+            path.append(nums[i])
+
+            backtracking(i + 1)
+
+            path.pop()
+
+    backtracking(0)
+    return result
+
+# 왜 앞선 Backtracking 코드와 달리 used가 필요하지 않을까?
+# 바로 start를 통해 그 뒤의 숫자들만 선택할 수 있게 강제하였기 때문이다.
+# 따라서 [1, 2]를 만든 뒤,
+# [2, 1]이 다시 생성되지 않는 것이다.
+
+#########################################################################################
+
+# 

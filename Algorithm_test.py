@@ -103,4 +103,39 @@ class prefix_sum:
         i, j = map(int, input().strip().split())
         print(sum_list[j] - sum_list[i - 1])
 
-# 
+# Binary Search
+
+# 입력
+# 첫째 줄에 강의 개수 N과 담을 DVD 개수 M이 주어진다.
+# 둘째 줄에는 각 강의의 길이가 주어진다.
+
+# 예제 입력: 9 3
+#           1 2 3 4 5 6 7 8 9
+# 예제 출력: 17
+
+class binary_search:
+    N, M = map(int, input().strip().split())
+    nums = list(map(int, input().strip().split()))
+
+    start = max(nums)
+    end = sum(nums)
+    answer = end
+
+    while start <= end:
+        mid = (start + end) // 2
+
+        total = 0
+        count = 1
+
+        for i in nums:
+            if total + i > mid:
+                count += 1
+                total = 0
+            else:
+                total = i
+
+        if count <= M:
+            answer = mid
+            end = mid - 1
+        else:
+            start = mid + 1
