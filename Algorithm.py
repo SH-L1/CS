@@ -514,6 +514,7 @@ def countdown(n):
 
 # 재귀는 시간복잡도는 O(n)이지만,
 # Call Stack에 쌓이는 n개의 frame으로 인하여
+# (함수 호출마다 지역변수와 반환위치 등의 정보를 담은 stack frame이 call stack에 추가된다)
 # 추가 공간 O(n)이 필요하다.
 
 # 그래서 재귀가 항상 더 좋은 것은 아닌데 왜 사용할까?
@@ -600,4 +601,97 @@ def combinations(nums, k):
 
 #########################################################################################
 
-# 
+# Subset
+# 부분 집합
+# 각 원소마다 선택 or 선택하지 않음 두 가지 선택이 있기 때문에
+# 부분 집합의 개수는 2^n개이다.
+
+nums = [1, 2, 3]
+
+def subsets(nums):
+    result = []
+    path = []
+
+    def backtracking(start):
+        result.append(path.copy())
+
+        for i in range(start, len(nums)):
+            path.append(nums[i])
+
+            backtracking(i + 1)
+
+            path.pop()
+
+    backtracking(0)
+    return result
+
+# 순열과 달리 result.append(path.copy())가
+# Base Case(종료조건) 안에만 있지 않는다.
+# 현재 상태 하나하나가 모두 valid subset이기 때문이다.
+
+# Backtracking vs DFS
+# DFS는 깊이 우선 탐색 방식이고
+# Backtracking은 DFS를 하면서 선택 상태를 만들고 다시 되돌리는 문제 해결 패턴이다.
+# 모든 Backtracking은 대게 DFS 형태이지만,
+# 모든 DFS가 Backtracking인 것은 아니다.
+
+# 예를 들어,
+# 길 찾기와 같은 문제에서는 'visited(방문함)'만 체크하고 끝까지 간다.
+# 이미 방문한 길은 다시 안간다는 것이다.
+# 다시 말해, DFS는 상태를 pop()으로 복원하지 않을 수도 있는 반면에
+# Backtracking은 append 후, pop()처럼
+# 상태 복구가 핵심이다.
+
+# Backtracking의 진짜 강점: Pruning
+# Backtracking을 그냥 모든 경우의 수를 만드는 것으로만 생각하면 부족하다.
+# 핵심 중 하나는
+# 답이 될 수 없는 branch를 미리 버린다는 것이다.
+# 이를 Pruning(가지치기) 라고 한다.
+
+# 예를 들어, 숫자를 골라 합이 target이 되어야 한다고 하자.
+# 모든 숫자가 양수인데 현재 합이 이미 target을 넘었다면
+# 더 내려갈 필요가 없어 실제 탐색량을 크게 줄일 수 있다.
+# 또, 현재 상태에서 어떤 방식으로 진행해도 정답이 될 수 없음을 알 수 있으면
+# 재귀 호출을 초기에 제거할 수 있다.
+
+#########################################################################################
+
+# Combination Sum 대표 문제
+
+nums = [2, 3, 6, 7]
+target = 7
+
+def combination_sum(nums, target):
+    result = []
+    path = []
+
+    def backtracking(start, remaining):
+        if remaining == 0:
+            result.append(path.copy())
+            return
+
+        if remaining < 0:
+            return
+
+        for i in range(start, len(nums)):
+            value = nums[i]            
+            path.append(value)
+            
+            backtracking(i, remaining - value)
+            
+            path.pop()
+
+    backtracking(0, target)
+    return result
+
+# 여기에서도 핵심 아이디어인
+# choose -> explore -> unchoose 가 적용된다.
+
+# Python 자체의 주의점
+# 파이썬은 C++처럼 깊은 재귀를 마음대로 쓰기 어렵다
+# 왜냐하면 기본 재귀 제한이 비교적 낮기 때문이다.
+# (일반적으로 약 1000회 수준, C++은 수만~수십만 회)
+# 그래서
+import sys
+sys.setrecursionlimit(10**6)
+# 으로 조절하기도 하지만, iterative DFS를 쓰기도 한다.
