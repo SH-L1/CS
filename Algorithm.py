@@ -4,7 +4,6 @@
 # 1. 시간복잡도 설명
 # 2. 자료구조 선택 이유
 # 3. edge case 처리
-# 4. 읽기 좋은 코드
 
 # Two Pointer
 
@@ -695,3 +694,104 @@ def combination_sum(nums, target):
 import sys
 sys.setrecursionlimit(10**6)
 # 으로 조절하기도 하지만, iterative DFS를 쓰기도 한다.
+
+#########################################################################################
+
+# Divide & Conquer (분할 정복)
+# 큰 문제를 작은 문제로 나눠 각각 해결한 뒤, 결과를 합치는 방식이다.
+# 핵심 구조는 3단계로 나뉜다.
+# Divide : 문제를 작은 문제로 나눈다.
+# Conquer : 작은 문제를 해결한다.
+# Combine : 작은 문제의 결과를 합친다.
+
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr;
+
+    mid = len(arr) // 2
+
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = 0
+    j = 0
+
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+
+    result.extend(left[i:])
+    result.extend(right[j:])
+
+# 시간복잡도 또한 해당 방식으로 계산한다.
+# 입력 크기 n을 절반으로 나누므로 2T(n/2),
+# merge에 O(n)이 필요하다.
+# 그래서 T(n) = 2T(n/2) + O(n)이다.
+
+# 이걸 재귀 트리로 보면
+# level 0: n, level 1: n/2 + n/2 = n ...
+# 즉, 각 level의 총 작업량은 O(n)이다.
+# level의 수는 분할이므로 O(log n),
+# 최종적으로 시간복잡도는 O(n log n)이 되는 것이다.
+
+# Divide & Conquer와 Backtracking의 차이
+# Divide & Conquer는 작은 문제들이 보통 독립적이다.
+# 그러나 Backtracking은 가능한 선택지를 탐색한다.
+
+# Divide & Conquer와 DP(Dynamic Programming) 차이
+# 둘 다 작은 문제로 나눈다.
+# 그러나, Divide & Conquer는 작은 문제가 보통 겹치지 않는다.
+# DP의 경우에는 작은 문제가 반복된다.
+
+nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+
+def max_subarray(nums):
+    def solve(left, right):
+        if left == right:
+            return nums[left]
+
+        mid = (left + right) // 2
+
+        left_best = solve(left, mid)
+        right_best = solve(mid + 1, right)
+
+        total = 0
+        best_left_sum = float("-inf")
+
+        for i in range(mid, left - 1, -1):
+            total += nums[i]
+            best_left_sum = max(best_left_sum, total)
+
+        total = 0
+        best_right_sum = float("-inf")
+
+        for i in range(mid + 1, right + 1):
+            total += nums[i]
+            best_right_sum = max(best_right_sum, total)
+
+        cross_best = best_left_sum + best_right_sum
+
+        return max(left_best, right_best, cross_best)
+
+    return solve(0, len(nums) - 1)
+
+# 시간복잡도는 T(n) = 2T(n/2) + O(n)
+# 즉, O(n log n)이다.
+
+# Divide & Conquer의 장점은
+# 큰 문제를 구조적으로 단순화하고
+# 병렬화 가능성이 생기며
+# 재귀적으로 깔끔하게 표현이 가능하다는 것이다.
+# 특히, 정렬과 기하 문제, Tree-like decomposition에 자주 등장한다.
+
+# 하지만, 단점도 존재한다.
+# 재귀 호출 오버헤드(Call Stack)가 있다.
+# 같은 작은 문제가 계속 중복 계산될 경우, 비효율적이다.
